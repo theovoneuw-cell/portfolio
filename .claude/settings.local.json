@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --yes serve . --port 3000)",
+      "Bash(python -m http.server 3000)",
+      "WebFetch(domain:open.spotify.com)",
+      "Bash(python3 /tmp/build_portfolio.py)",
+      "Bash(where python *)",
+      "Bash(where python3 *)",
+      "Bash(where node *)",
+      "Bash(where py *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git remote *)"
+    ]
+  }
+}
