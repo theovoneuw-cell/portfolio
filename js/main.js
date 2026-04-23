@@ -39,12 +39,21 @@ document.querySelectorAll(
 });
 
 // ── PORTFOLIO FILTER + VOIR PLUS ─────────────────────────────
+const gridWrap = document.querySelector('.portfolio-grid-wrap');
+const grid     = document.getElementById('portfolioGrid');
+
+// Déplace les .voir-plus hors de la grille, dans le wrapper
+document.querySelectorAll('.voir-plus').forEach(btn => gridWrap.appendChild(btn));
+
 function applyFilter(f) {
+  gridWrap.classList.remove('expanded');
+
   document.querySelectorAll('.track-card').forEach(card => {
     const match = card.dataset.cat === f;
     const extra = card.dataset.extra === '1';
     card.classList.toggle('hidden', !match || extra);
   });
+
   document.querySelectorAll('.voir-plus').forEach(btn => {
     btn.classList.toggle('hidden', btn.dataset.cat !== f);
   });
@@ -53,10 +62,9 @@ function applyFilter(f) {
 document.querySelectorAll('.voir-plus').forEach(btn => {
   btn.addEventListener('click', () => {
     const cat = btn.dataset.cat;
-    document.querySelectorAll(`.track-card[data-cat="${cat}"][data-extra="1"]`).forEach(c => {
-      c.classList.remove('hidden');
-    });
+    document.querySelectorAll(`.track-card[data-cat="${cat}"][data-extra="1"]`).forEach(c => c.classList.remove('hidden'));
     btn.classList.add('hidden');
+    gridWrap.classList.add('expanded');
   });
 });
 
