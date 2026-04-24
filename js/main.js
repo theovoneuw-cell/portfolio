@@ -188,7 +188,25 @@ document.querySelectorAll('.custom-player').forEach(player => {
 document.getElementById('contactForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const note = document.getElementById('formNote');
-  note.textContent = 'Message envoyé ! Je reviens vers vous sous 24 h.';
-  this.reset();
-  setTimeout(() => { note.textContent = ''; }, 6000);
+  const btn  = this.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = 'Envoi…';
+
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(new FormData(this)).toString()
+  })
+  .then(() => {
+    note.textContent = 'Message envoyé ! Je reviens vers vous sous 24 h.';
+    this.reset();
+    btn.disabled = false;
+    btn.textContent = 'Envoyer le message';
+    setTimeout(() => { note.textContent = ''; }, 6000);
+  })
+  .catch(() => {
+    note.textContent = 'Erreur — réessayez ou écrivez directement par email.';
+    btn.disabled = false;
+    btn.textContent = 'Envoyer le message';
+  });
 });
