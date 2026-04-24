@@ -149,8 +149,8 @@ h1, h2, h3 {
 }
 .btn-nav:hover { background: rgba(255,255,255,0.16) !important; }
 
-.nav-burger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; }
-.nav-burger span { display: block; width: 22px; height: 1.5px; background: var(--text); border-radius: 2px; transition: all .3s; }
+.nav-burger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 6px; padding: 4px; }
+.nav-burger span { display: block; width: 22px; height: 1.5px; background: var(--text); border-radius: 2px; transition: transform .3s ease, opacity .3s ease; }
 
 /* ── HERO ─────────────────────────────────────────────────── */
 #hero {
@@ -996,8 +996,7 @@ footer {
 
 @media (max-width: 680px) {
   /* Nav */
-  .nav-links { display: none; }
-  .nav-links.open {
+  .nav-links {
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -1008,24 +1007,35 @@ footer {
     align-items: center;
     justify-content: center;
     gap: 32px;
-    z-index: 99;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .25s ease, transform .25s ease;
   }
-  .nav-links.open li { list-style: none; }
-  .nav-links.open a {
+  .nav-links.open {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .nav-links li { list-style: none; }
+  .nav-links a {
     font-size: 22px;
     font-weight: 300;
-    color: var(--text);
+    color: var(--muted);
     letter-spacing: -0.02em;
+    transition: color .2s;
   }
-  .nav-links.open a:hover { color: #fff; }
-  .nav-links.open .btn-nav {
+  .nav-links a:hover { color: var(--text); }
+  .nav-links .btn-nav {
     font-size: 15px !important;
     padding: 10px 28px !important;
+    color: var(--text) !important;
   }
   .nav-burger { display: flex; }
-  .nav-burger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-burger.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
   .nav-burger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-  .nav-burger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+  .nav-burger.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
   /* Layout */
   .container { padding: 0 20px; }
