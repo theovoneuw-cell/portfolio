@@ -114,6 +114,11 @@ h1, h2, h3 {
   transform: translateY(-4px);
   transition: opacity .25s ease, transform .25s ease;
 }
+#navbar.nav-hidden .nav-burger.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
 .nav-links, .nav-burger {
   transition: opacity .25s ease, transform .25s ease;
 }
