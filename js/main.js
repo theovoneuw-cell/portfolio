@@ -7,16 +7,20 @@ window.addEventListener('scroll', () => {
 // ── MOBILE BURGER ─────────────────────────────────────────────
 const burger   = document.querySelector('.nav-burger');
 const navLinks = document.querySelector('.nav-links');
+const appFloat = document.getElementById('appFloat');
+
 burger.addEventListener('click', () => {
   const isOpen = navLinks.classList.toggle('open');
   burger.classList.toggle('open');
   document.body.style.overflow = isOpen ? 'hidden' : '';
+  if (appFloat) appFloat.style.zIndex = isOpen ? '-1' : '';
 });
 navLinks.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     navLinks.classList.remove('open');
     burger.classList.remove('open');
     document.body.style.overflow = '';
+    if (appFloat) appFloat.style.zIndex = '';
   });
 });
 
