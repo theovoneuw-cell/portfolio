@@ -204,17 +204,21 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
   btn.disabled = true;
   btn.textContent = 'Envoi…';
 
-  fetch('/', {
+  fetch('https://formspree.io/f/xwvaagja', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams(new FormData(this)).toString()
+    headers: { 'Accept': 'application/json' },
+    body: new FormData(this)
   })
-  .then(() => {
-    note.textContent = 'Message envoyé ! Je reviens vers vous sous 24 h.';
-    this.reset();
+  .then(r => {
+    if (r.ok) {
+      note.textContent = 'Message envoyé ! Je reviens vers vous sous 24 h.';
+      this.reset();
+      setTimeout(() => { note.textContent = ''; }, 6000);
+    } else {
+      note.textContent = 'Erreur — réessayez ou écrivez directement par email.';
+    }
     btn.disabled = false;
     btn.textContent = 'Envoyer le message';
-    setTimeout(() => { note.textContent = ''; }, 6000);
   })
   .catch(() => {
     note.textContent = 'Erreur — réessayez ou écrivez directement par email.';
