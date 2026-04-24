@@ -1,11 +1,9 @@
 // ── NAVBAR scroll ────────────────────────────────────────────
 const navbar = document.getElementById('navbar');
-let lastScrollY = 0;
 window.addEventListener('scroll', () => {
   const y = window.scrollY;
   navbar.classList.toggle('scrolled', y > 40);
-  navbar.classList.toggle('nav-hidden', y > lastScrollY && y > 80);
-  lastScrollY = y;
+  navbar.classList.toggle('nav-hidden', y > 80);
 });
 
 // ── MOBILE BURGER ─────────────────────────────────────────────
