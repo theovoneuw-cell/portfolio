@@ -28,6 +28,17 @@ navLinks.querySelectorAll('a').forEach(a => {
   });
 });
 
+const navClose = document.querySelector('.nav-close');
+if (navClose) {
+  navClose.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    burger.classList.remove('open');
+    navbar.classList.remove('menu-open');
+    document.body.style.overflow = '';
+    if (appFloat) appFloat.style.zIndex = '';
+  });
+}
+
 // ── HERO WAVEFORM ─────────────────────────────────────────────
 (function buildWave() {
   const wave = document.getElementById('heroWave');
