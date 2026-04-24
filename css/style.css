@@ -1000,7 +1000,7 @@ footer {
     display: flex;
     flex-direction: column;
     position: fixed;
-    inset: var(--nav-h) 0 0 0;
+    inset: 0 0 0 0;
     background: rgba(10,10,10,.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -1010,13 +1010,11 @@ footer {
     z-index: 200;
     pointer-events: none;
     opacity: 0;
-    transform: translateY(-8px);
-    transition: opacity .25s ease, transform .25s ease;
+    transition: opacity .25s ease;
   }
   .nav-links.open {
     pointer-events: auto;
     opacity: 1;
-    transform: translateY(0);
   }
   .nav-links li { list-style: none; }
   .nav-links a {

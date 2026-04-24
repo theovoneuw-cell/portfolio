@@ -8,13 +8,15 @@ window.addEventListener('scroll', () => {
 const burger   = document.querySelector('.nav-burger');
 const navLinks = document.querySelector('.nav-links');
 burger.addEventListener('click', () => {
-  navLinks.classList.toggle('open');
+  const isOpen = navLinks.classList.toggle('open');
   burger.classList.toggle('open');
+  document.body.style.overflow = isOpen ? 'hidden' : '';
 });
 navLinks.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     navLinks.classList.remove('open');
     burger.classList.remove('open');
+    document.body.style.overflow = '';
   });
 });
 
