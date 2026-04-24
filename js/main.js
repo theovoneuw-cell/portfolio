@@ -9,9 +9,13 @@ const burger   = document.querySelector('.nav-burger');
 const navLinks = document.querySelector('.nav-links');
 burger.addEventListener('click', () => {
   navLinks.classList.toggle('open');
+  burger.classList.toggle('open');
 });
 navLinks.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => navLinks.classList.remove('open'));
+  a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    burger.classList.remove('open');
+  });
 });
 
 // ── HERO WAVEFORM ─────────────────────────────────────────────
