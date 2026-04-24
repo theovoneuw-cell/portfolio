@@ -107,17 +107,12 @@ h1, h2, h3 {
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 1px 0 var(--border);
 }
-#navbar.nav-hidden .nav-links,
-#navbar.nav-hidden .nav-burger {
+#navbar.nav-hidden:not(.menu-open) .nav-links,
+#navbar.nav-hidden:not(.menu-open) .nav-burger {
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
   transition: opacity .25s ease, transform .25s ease;
-}
-#navbar.nav-hidden .nav-burger.open {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
 }
 .nav-links, .nav-burger {
   transition: opacity .25s ease, transform .25s ease;
