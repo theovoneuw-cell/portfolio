@@ -66,9 +66,14 @@ if (!isTouch) {
   document.body.appendChild(cursor);
   document.body.appendChild(cursorDot);
 
+  let cursorVisible = false;
   window.addEventListener('mousemove', e => {
-    gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.05 });
-    gsap.to(cursor,    { x: e.clientX, y: e.clientY, duration: 0.18, ease: "power2.out" });
+    if (!cursorVisible) {
+      cursorVisible = true;
+      gsap.to([cursor, cursorDot], { opacity: 1, duration: 0.3 });
+    }
+    gsap.set(cursorDot, { x: e.clientX, y: e.clientY });
+    gsap.to(cursor,     { x: e.clientX, y: e.clientY, duration: 0.18, ease: "power2.out" });
   });
   document.querySelectorAll('a, button, .service-card, .track-card, .filter-btn').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('g-cursor--hover'));
