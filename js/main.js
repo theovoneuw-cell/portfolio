@@ -360,13 +360,43 @@ function initScrollAnimations() {
     opacity: 0, y: 50, duration: 0.8, stagger: 0.15, ease: "power3.out"
   });
 
-  // Parcours — alternance gauche/droite
-  gsap.utils.toArray('.parcours-item').forEach((item, i) => {
+  // Parcours — ligne verticale qui se dessine de haut en bas
+  gsap.to(".timeline-line", {
+    scrollTrigger: { trigger: ".timeline", start: "top 80%", end: "bottom 20%", scrub: 1 },
+    scaleY: 1, transformOrigin: "top center", ease: "none"
+  });
+
+  // Timeline items — slide depuis la gauche + fade, en cascade
+  gsap.utils.toArray('.timeline-item').forEach((item, i) => {
+    const dot  = item.querySelector('.timeline-date');
+    const body = item.querySelector('.timeline-body');
+
     gsap.from(item, {
       scrollTrigger: { trigger: item, start: "top 88%" },
-      opacity: 0, x: i % 2 === 0 ? -60 : 60,
-      duration: 0.7, ease: "power3.out"
+      opacity: 0, x: -50, duration: 0.65, ease: "power3.out",
+      delay: i * 0.05
     });
+
+    // Date et corps avec micro-décalage
+    if (dot)  gsap.from(dot,  { scrollTrigger: { trigger: item, start: "top 88%" }, opacity: 0, x: -20, duration: 0.5, ease: "power2.out", delay: i * 0.05 + 0.1 });
+    if (body) gsap.from(body, { scrollTrigger: { trigger: item, start: "top 88%" }, opacity: 0, y: 12,  duration: 0.5, ease: "power2.out", delay: i * 0.05 + 0.18 });
+  });
+
+  // Logos outils — apparition avec scale + rotation légère en cascade
+  gsap.from(".tool-item", {
+    scrollTrigger: { trigger: ".tools", start: "top 88%" },
+    opacity: 0, scale: 0.6, rotation: -8, duration: 0.6,
+    stagger: { amount: 0.4, from: "start" },
+    ease: "back.out(2)"
+  });
+
+  // Image logo dans chaque outil — pop légèrement après le conteneur
+  gsap.from(".tool-item img", {
+    scrollTrigger: { trigger: ".tools", start: "top 88%" },
+    scale: 0.5, opacity: 0, duration: 0.5,
+    stagger: { amount: 0.4, from: "start" },
+    ease: "back.out(2.5)",
+    delay: 0.1
   });
 
   // Contact
