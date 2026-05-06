@@ -205,17 +205,56 @@ setTimeout(() => {
 
 // ── HERO ANIMATIONS (appelées après le loader) ────────────────
 function triggerHeroAnimations() {
-  gsap.to(".hero-tag",  { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.0 });
-  gsap.from('.hero-name .g-char', {
-    opacity: 0, y: 80, rotateX: -90, duration: 0.65,
-    stagger: 0.035, ease: "back.out(1.4)", delay: 0.15,
-    transformOrigin: "0% 50% -50",
-    onStart: () => gsap.set('.hero-name', { opacity: 1 })
-  });
-  gsap.to(".hero-sub",    { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.6  });
-  gsap.to(".btn-primary", { opacity: 1, x: 0, duration: 0.55, ease: "power3.out", delay: 0.8 });
-  gsap.to(".btn-ghost",   { opacity: 1, x: 0, duration: 0.55, ease: "power3.out", delay: 0.9 });
-  gsap.to(".hero-scroll", { opacity: 1, y: 0, duration: 0.8,  ease: "power2.out", delay: 1.1 });
+  const tl = gsap.timeline();
+
+  // 1. Ligne horizontale qui traverse l'écran (reveal bar)
+  const bar = document.createElement('div');
+  bar.className = 'g-reveal-bar';
+  document.body.appendChild(bar);
+
+  tl
+    // Barre blanche qui balaye de gauche à droite
+    .set(bar, { scaleX: 0, transformOrigin: 'left center' })
+    .to(bar, { scaleX: 1, duration: 0.55, ease: 'power3.inOut' })
+    .to(bar, { scaleX: 0, transformOrigin: 'right center', duration: 0.45, ease: 'power3.inOut' })
+
+    // 2. Onde hero explose depuis le bas (opacity monte)
+    .to('.hero-wave', { opacity: 0.18, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+
+    // 3. Hero tag — glitch puis stabilise
+    .set('.hero-tag', { opacity: 1 })
+    .from('.hero-tag', {
+      x: () => (Math.random() - 0.5) * 30,
+      skewX: 8, duration: 0.5, ease: 'power3.out'
+    }, '-=0.2')
+
+    // 4. Nom — lettres tombent en 3D une par une
+    .set('.hero-name', { opacity: 1 })
+    .from('.hero-name .g-char', {
+      opacity: 0, y: 100, rotateX: -80, scaleY: 0.4,
+      duration: 0.6, stagger: 0.032,
+      ease: 'back.out(1.6)',
+      transformOrigin: '50% 100% -20px'
+    }, '-=0.15')
+
+    // 5. Ligne séparatrice qui s'étire sous le nom
+    .from('.g-line-sep', { scaleX: 0, duration: 0.5, ease: 'power3.out', transformOrigin: 'left' }, '-=0.1')
+
+    // 6. Sous-titre — masque clip qui s'ouvre
+    .set('.hero-sub', { opacity: 1 })
+    .from('.hero-sub', { clipPath: 'inset(0 100% 0 0)', duration: 0.55, ease: 'power3.out' }, '-=0.1')
+
+    // 7. Boutons depuis les côtés avec rebond
+    .set('.btn-primary, .btn-ghost', { opacity: 1 })
+    .from('.btn-primary', { x: -40, opacity: 0, duration: 0.5, ease: 'back.out(2)' }, '-=0.1')
+    .from('.btn-ghost',   { x:  40, opacity: 0, duration: 0.5, ease: 'back.out(2)' }, '-=0.45')
+
+    // 8. Scroll indicator fade
+    .set('.hero-scroll', { opacity: 1 })
+    .from('.hero-scroll', { y: -12, opacity: 0, duration: 0.7, ease: 'power2.out' }, '-=0.2')
+
+    // 9. Nettoyage de la barre
+    .add(() => bar.remove(), '+=0.1');
 }
 
 // ── SCROLL ANIMATIONS (initialisées après le loader) ──────────
