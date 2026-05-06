@@ -102,12 +102,12 @@ if (heroName) {
 
   // Dimensions responsives selon la largeur de l'écran
   const vw   = window.innerWidth;
-  const W    = Math.min(vw * 0.7, 280);
-  const H    = Math.round(W * 0.33);
+  const W    = Math.min(vw * 0.88, 320);
+  const H    = Math.round(W * 0.4);
   canvas.width  = W;
   canvas.height = H;
 
-  const N    = vw < 480 ? 18 : 28;
+  const N    = vw < 480 ? 24 : 32;
   const GAP  = vw < 480 ? 2  : 3;
   const barW = (W - GAP * (N - 1)) / N;
 
@@ -222,66 +222,78 @@ function triggerHeroAnimations() {
   const tl     = gsap.timeline();
   const mobile = window.innerWidth < 680;
 
-  // Valeurs adaptées selon le device
-  const charY      = mobile ? 60  : 100;
-  const btnOffset  = mobile ? 24  : 40;
-  const staggerVal = mobile ? 0.025 : 0.032;
+  // 1. Flash blanc — impact maximal même sur mobile
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;pointer-events:none;opacity:0';
+  document.body.appendChild(flash);
 
-  // 1. Barre blanche qui traverse l'écran
+  // 2. Barre reveal
   const bar = document.createElement('div');
   bar.className = 'g-reveal-bar';
   document.body.appendChild(bar);
 
   tl
-    .set(bar, { scaleX: 0, transformOrigin: 'left center' })
-    .to(bar,  { scaleX: 1, duration: 0.5, ease: 'power3.inOut' })
-    .to(bar,  { scaleX: 0, transformOrigin: 'right center', duration: 0.4, ease: 'power3.inOut' })
+    // Flash d'entrée
+    .to(flash, { opacity: 0.18, duration: 0.08, ease: 'none' })
+    .to(flash, { opacity: 0,    duration: 0.35, ease: 'power2.out', onComplete: () => flash.remove() })
 
-    // 2. Onde hero apparaît
-    .to('.hero-wave', { opacity: mobile ? 0.12 : 0.18, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    // Barre qui traverse
+    .set(bar, { scaleX: 0, opacity: 1, transformOrigin: 'left center' }, 0.05)
+    .to(bar,  { scaleX: 1, duration: 0.45, ease: 'expo.inOut' }, 0.05)
+    .to(bar,  { scaleX: 0, transformOrigin: 'right center', duration: 0.38, ease: 'expo.inOut' })
 
-    // 3. Hero tag — glitch
+    // Onde hero — plus lumineuse sur mobile
+    .to('.hero-wave', { opacity: mobile ? 0.22 : 0.18, duration: 0.7, ease: 'power2.out' }, '-=0.35')
+
+    // Hero tag — entrée avec skew fort
     .set('.hero-tag', { opacity: 1 })
-    .from('.hero-tag', { x: mobile ? 0 : 15, skewX: mobile ? 4 : 8, duration: 0.45, ease: 'power3.out' }, '-=0.2')
+    .from('.hero-tag', {
+      x: mobile ? 30 : 15, skewX: mobile ? 12 : 8, opacity: 0,
+      duration: 0.5, ease: 'power3.out'
+    }, '-=0.25')
 
-    // 4. Nom — lettres en 3D
+    // Nom — lettres en chute 3D, plus ample sur mobile
     .set('.hero-name', { opacity: 1 })
     .from('.hero-name .g-char', {
-      opacity: 0, y: charY, rotateX: -80, scaleY: 0.4,
-      duration: 0.55, stagger: staggerVal,
-      ease: 'back.out(1.6)',
+      opacity: 0,
+      y:        mobile ? 90  : 100,
+      rotateX:  mobile ? -90 : -80,
+      scaleY:   mobile ? 0.2 : 0.4,
+      duration: mobile ? 0.65 : 0.55,
+      stagger:  mobile ? 0.032 : 0.028,
+      ease: 'back.out(2)',
       transformOrigin: '50% 100% -20px'
+    }, '-=0.1')
+
+    // Ligne séparatrice
+    .from('.g-line-sep', { scaleX: 0, duration: 0.5, ease: 'power3.out', transformOrigin: 'left' }, '-=0.15')
+
+    // Sous-titre — slide + fade (iOS Safari safe)
+    .set('.hero-sub', { opacity: 1 })
+    .from('.hero-sub', { y: mobile ? 28 : 0, opacity: 0, duration: 0.55, ease: 'power3.out',
+      ...(mobile ? {} : { clipPath: 'inset(0 100% 0 0)' })
     }, '-=0.15')
 
-    // 5. Ligne séparatrice (masquée sur très petit écran via CSS)
-    .from('.g-line-sep', { scaleX: 0, duration: 0.5, ease: 'power3.out', transformOrigin: 'left' }, '-=0.1')
-
-    // 6. Sous-titre — fade+slide sur mobile (pas clipPath, iOS Safari safe)
-    .set('.hero-sub', { opacity: 1 })
-    .from('.hero-sub', mobile
-      ? { y: 16, opacity: 0, duration: 0.5, ease: 'power3.out' }
-      : { clipPath: 'inset(0 100% 0 0)', duration: 0.55, ease: 'power3.out' }
-    , '-=0.1')
-
-    // 7. Boutons
+    // Boutons — rebond asymétrique
     .set('.btn-primary, .btn-ghost', { opacity: 1 })
-    .from('.btn-primary', { x: -btnOffset, opacity: 0, duration: 0.45, ease: 'back.out(2)' }, '-=0.1')
-    .from('.btn-ghost',   { x:  btnOffset, opacity: 0, duration: 0.45, ease: 'back.out(2)' }, '-=0.4')
+    .from('.btn-primary', { x: mobile ? -50 : -40, opacity: 0, duration: 0.55, ease: 'back.out(2.5)' }, '-=0.1')
+    .from('.btn-ghost',   { x: mobile ?  50 :  40, opacity: 0, duration: 0.55, ease: 'back.out(2.5)' }, '-=0.45')
 
-    // 8. Scroll indicator
+    // Scroll indicator
     .set('.hero-scroll', { opacity: 1 })
-    .from('.hero-scroll', { y: -10, opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.2')
+    .from('.hero-scroll', { y: -16, opacity: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)' }, '-=0.2')
 
     .add(() => bar.remove(), '+=0.1');
 }
 
 // ── SCROLL ANIMATIONS (initialisées après le loader) ──────────
 function initScrollAnimations() {
+  const mob = window.innerWidth < 680;
 
-  // Parallax fond hero
+  // Parallax fond hero (réduit sur mobile)
   gsap.to(".hero-bg", {
     scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true },
-    y: 120, ease: "none"
+    y: mob ? 60 : 120, ease: "none"
   });
 
   // Navbar hide/show au scroll
@@ -294,119 +306,153 @@ function initScrollAnimations() {
     }
   });
 
-  // Section tags — ligne qui s'étire
+  // Section tags — ligne qui s'étire + montée
   gsap.utils.toArray('.section-tag').forEach(tag => {
     gsap.from(tag, {
-      scrollTrigger: { trigger: tag, start: "top 88%" },
-      scaleX: 0, opacity: 0, duration: 0.6, ease: "power3.out",
+      scrollTrigger: { trigger: tag, start: "top 95%" },
+      y: mob ? 20 : 0, scaleX: 0, opacity: 0, duration: 0.7, ease: "expo.out",
       transformOrigin: "left center"
     });
   });
 
-  // Titres de section
+  // Titres de section — chute amplifiée
   gsap.utils.toArray('.section-title').forEach(el => {
     gsap.from(el, {
-      scrollTrigger: { trigger: el, start: "top 85%" },
-      opacity: 0, y: 40, duration: 0.9, ease: "power3.out"
+      scrollTrigger: { trigger: el, start: "top 92%" },
+      opacity: 0, y: mob ? 70 : 40, skewY: mob ? 3 : 0,
+      duration: mob ? 1.0 : 0.9, ease: "power4.out"
     });
   });
 
-  // À propos
+  // À propos — visuel + texte en cascade
   gsap.from(".about-visual", {
-    scrollTrigger: { trigger: "#about", start: "top 78%" },
-    opacity: 0, scale: 0.85, duration: 1, ease: "power3.out"
+    scrollTrigger: { trigger: "#about", start: "top 90%" },
+    opacity: 0, scale: mob ? 0.75 : 0.85,
+    y: mob ? 60 : 0,
+    duration: mob ? 1.1 : 1.0, ease: "power3.out"
   });
   gsap.from(".about-text > *", {
-    scrollTrigger: { trigger: ".about-text", start: "top 80%" },
-    opacity: 0, x: 50, duration: 0.7, stagger: 0.12, ease: "power3.out"
+    scrollTrigger: { trigger: ".about-text", start: "top 92%" },
+    opacity: 0, x: mob ? 0 : 50, y: mob ? 40 : 0,
+    duration: 0.7, stagger: 0.14, ease: "power3.out"
   });
 
-  // Compteurs animés
+  // Compteurs — chiffres animés avec rebond
   gsap.utils.toArray('.stat-num').forEach(el => {
     const raw = el.innerText.replace(/[^0-9]/g, '');
     if (!raw) return;
     const target = parseInt(raw);
     const suffix = el.innerHTML.replace(/[0-9]/g, '');
     const obj = { val: 0 };
+    gsap.from(el, {
+      scrollTrigger: { trigger: el, start: "top 95%" },
+      scale: mob ? 1.4 : 1.2, opacity: 0, duration: 0.5, ease: "back.out(3)"
+    });
     gsap.to(obj, {
-      scrollTrigger: { trigger: el, start: "top 88%" },
-      val: target, duration: 1.8, ease: "power2.out",
+      scrollTrigger: { trigger: el, start: "top 95%" },
+      val: target, duration: 2.0, ease: "power2.out",
       onUpdate: () => { el.innerHTML = Math.round(obj.val) + suffix; }
     });
   });
 
-  // Services
+  // Services — cartes en éventail + rebond
   gsap.from(".service-card", {
-    scrollTrigger: { trigger: "#services", start: "top 75%" },
-    opacity: 0, y: 60, scale: 0.92, duration: 0.65,
-    stagger: { amount: 0.5, from: "center" },
-    ease: "back.out(1.2)"
+    scrollTrigger: { trigger: "#services", start: "top 90%" },
+    opacity: 0,
+    y:        mob ? 80  : 60,
+    scale:    mob ? 0.85 : 0.92,
+    rotation: mob ? (i => (i % 2 === 0 ? -4 : 4)) : 0,
+    duration: mob ? 0.8  : 0.65,
+    stagger:  { amount: mob ? 0.5 : 0.4, from: "start" },
+    ease: "back.out(1.6)"
   });
 
   // Portfolio
   gsap.from(".filter-tabs", {
-    scrollTrigger: { trigger: "#portfolio", start: "top 82%" },
-    opacity: 0, y: 20, duration: 0.6, ease: "power2.out"
+    scrollTrigger: { trigger: "#portfolio", start: "top 92%" },
+    opacity: 0, y: 28, duration: 0.65, ease: "power3.out"
   });
   gsap.from(".track-card:not(.hidden)", {
-    scrollTrigger: { trigger: "#portfolioGrid", start: "top 82%" },
-    opacity: 0, y: 50, scale: 0.94, duration: 0.55,
-    stagger: 0.07, ease: "power2.out"
+    scrollTrigger: { trigger: "#portfolioGrid", start: "top 92%" },
+    opacity: 0, y: mob ? 70 : 50, scale: mob ? 0.88 : 0.94,
+    duration: mob ? 0.7 : 0.55,
+    stagger: mob ? 0.1 : 0.07, ease: "power3.out"
   });
 
   // Section App
   gsap.from("#app .container > *", {
-    scrollTrigger: { trigger: "#app", start: "top 78%" },
-    opacity: 0, y: 50, duration: 0.8, stagger: 0.15, ease: "power3.out"
+    scrollTrigger: { trigger: "#app", start: "top 90%" },
+    opacity: 0, y: mob ? 70 : 50,
+    duration: mob ? 0.9 : 0.8,
+    stagger: 0.15, ease: "power3.out"
   });
 
-  // Parcours — ligne verticale qui se dessine de haut en bas
+  // Parcours — ligne verticale scrub
   gsap.to(".timeline-line", {
-    scrollTrigger: { trigger: ".timeline", start: "top 80%", end: "bottom 20%", scrub: 1 },
+    scrollTrigger: { trigger: ".timeline", start: "top 85%", end: "bottom 20%", scrub: 1 },
     scaleY: 1, transformOrigin: "top center", ease: "none"
   });
 
-  // Timeline items — slide depuis la gauche + fade, en cascade
+  // Timeline items — entrée dramatique sur mobile
   gsap.utils.toArray('.timeline-item').forEach((item, i) => {
     const dot  = item.querySelector('.timeline-date');
     const body = item.querySelector('.timeline-body');
 
     gsap.from(item, {
-      scrollTrigger: { trigger: item, start: "top 88%" },
-      opacity: 0, x: -50, duration: 0.65, ease: "power3.out",
-      delay: i * 0.05
+      scrollTrigger: { trigger: item, start: "top 95%" },
+      opacity: 0,
+      x:       mob ? -70  : -50,
+      y:       mob ?  20  : 0,
+      scale:   mob ? 0.92 : 1,
+      duration: mob ? 0.75 : 0.65,
+      ease: "power3.out",
+      delay: i * 0.04
     });
 
-    // Date et corps avec micro-décalage
-    if (dot)  gsap.from(dot,  { scrollTrigger: { trigger: item, start: "top 88%" }, opacity: 0, x: -20, duration: 0.5, ease: "power2.out", delay: i * 0.05 + 0.1 });
-    if (body) gsap.from(body, { scrollTrigger: { trigger: item, start: "top 88%" }, opacity: 0, y: 12,  duration: 0.5, ease: "power2.out", delay: i * 0.05 + 0.18 });
+    if (dot)  gsap.from(dot,  {
+      scrollTrigger: { trigger: item, start: "top 95%" },
+      opacity: 0, x: mob ? -30 : -20, duration: 0.5, ease: "power2.out",
+      delay: i * 0.04 + 0.1
+    });
+    if (body) gsap.from(body, {
+      scrollTrigger: { trigger: item, start: "top 95%" },
+      opacity: 0, y: mob ? 20 : 12, duration: 0.5, ease: "power2.out",
+      delay: i * 0.04 + 0.18
+    });
   });
 
-  // Logos outils — apparition avec scale + rotation légère en cascade
+  // Logos outils — pop avec rotation + rebond fort
   gsap.from(".tool-item", {
-    scrollTrigger: { trigger: ".tools", start: "top 88%" },
-    opacity: 0, scale: 0.6, rotation: -8, duration: 0.6,
-    stagger: { amount: 0.4, from: "start" },
-    ease: "back.out(2)"
+    scrollTrigger: { trigger: ".tools", start: "top 95%" },
+    opacity: 0, scale: mob ? 0.4 : 0.6,
+    rotation: mob ? -15 : -8,
+    y: mob ? 30 : 0,
+    duration: mob ? 0.7 : 0.6,
+    stagger: { amount: 0.5, from: "start" },
+    ease: "back.out(2.5)"
   });
 
-  // Image logo dans chaque outil — pop légèrement après le conteneur
   gsap.from(".tool-item img", {
-    scrollTrigger: { trigger: ".tools", start: "top 88%" },
-    scale: 0.5, opacity: 0, duration: 0.5,
-    stagger: { amount: 0.4, from: "start" },
-    ease: "back.out(2.5)",
-    delay: 0.1
+    scrollTrigger: { trigger: ".tools", start: "top 95%" },
+    scale: mob ? 0.2 : 0.5, opacity: 0,
+    rotation: mob ? 20 : 0,
+    duration: 0.55,
+    stagger: { amount: 0.5, from: "start" },
+    ease: "back.out(3)",
+    delay: 0.12
   });
 
   // Contact
   gsap.from(".contact-left", {
-    scrollTrigger: { trigger: "#contact", start: "top 80%" },
-    opacity: 0, x: -60, duration: 0.9, ease: "power3.out"
+    scrollTrigger: { trigger: "#contact", start: "top 90%" },
+    opacity: 0, x: mob ? 0 : -60, y: mob ? 50 : 0,
+    duration: mob ? 0.9 : 0.9, ease: "power3.out"
   });
   gsap.from(".contact-form", {
-    scrollTrigger: { trigger: "#contact", start: "top 80%" },
-    opacity: 0, x: 60, duration: 0.9, ease: "power3.out"
+    scrollTrigger: { trigger: "#contact", start: "top 90%" },
+    opacity: 0, x: mob ? 0 : 60, y: mob ? 60 : 0,
+    duration: mob ? 0.9 : 0.9, ease: "power3.out",
+    delay: mob ? 0.1 : 0
   });
 }
 

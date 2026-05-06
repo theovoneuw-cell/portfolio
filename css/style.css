@@ -1078,10 +1078,14 @@ footer {
   .hero-tag { letter-spacing: 1.5px; font-size: 10px; }
   .hero-name { font-size: clamp(54px, 16vw, 100px); }
   .hero-sub  { max-width: 100%; }
-  .hero-wave { height: 80px; }
+  .hero-wave { height: 110px; opacity: 0.22; }
   .hero-cta  { flex-direction: column; align-items: center; }
   .hero-cta .btn-primary,
   .hero-cta .btn-ghost { width: 100%; max-width: 280px; text-align: center; }
+
+  /* Titres section — overflow visible pour skewY */
+  .section-header { overflow: visible; }
+  .section-title  { overflow: visible; }
 
   /* About */
   .about-stats { gap: 24px; flex-wrap: wrap; }
