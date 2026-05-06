@@ -82,7 +82,9 @@ if (!isTouch) {
 }
 
 // ── PRÉPARE LES LETTRES DU NOM (DOM, avant tout) ─────────────
-const heroName = document.querySelector('.hero-name');
+const heroName    = document.querySelector('.hero-name');
+const heroContent = document.querySelector('.hero-content');
+
 if (heroName) {
   const lines = heroName.innerHTML.split('<br>');
   heroName.innerHTML = lines.map(line =>
@@ -90,13 +92,17 @@ if (heroName) {
     line.replace(/(\S)/g, '<span class="g-char">$1</span>') +
     '</span>'
   ).join('');
-  // Cache le hero content pendant le loader
-  gsap.set('.hero-tag, .hero-name, .hero-sub, .hero-cta, .hero-scroll', { opacity: 0 });
 }
+// Cache le hero via classe CSS — si GSAP plante, on enlève juste la classe
+if (heroContent) heroContent.classList.add('hero-loading');
 
-// Fallback : si les animations plantent, on s'assure que le hero reste visible
+// Fallback : retire la classe et nettoie tout inline style GSAP
 function _heroFallback() {
-  gsap.set('.hero-tag, .hero-name, .hero-sub, .hero-cta, .hero-scroll', { opacity: 1, clearProps: 'all' });
+  if (heroContent) {
+    heroContent.classList.remove('hero-loading');
+    heroContent.style.opacity = '';
+  }
+  gsap.set('.hero-tag, .hero-name, .hero-sub, .hero-cta, .hero-scroll', { clearProps: 'all' });
 }
 
 // ── LOADER SPECTRUM ANALYZER ──────────────────────────────────
@@ -227,41 +233,31 @@ setTimeout(() => {
 
 // ── HERO ANIMATIONS (appelées après le loader) ────────────────
 function triggerHeroAnimations() {
-  const tl     = gsap.timeline();
   const mobile = window.innerWidth < 680;
 
-  // 1. Flash blanc — impact maximal même sur mobile
-  const flash = document.createElement('div');
-  flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:1000002;pointer-events:none;opacity:0';
-  document.body.appendChild(flash);
+  // Révèle le hero-content (retire la classe CSS qui le cachait)
+  if (heroContent) heroContent.classList.remove('hero-loading');
 
-  // 2. Barre reveal
+  // Barre reveal horizontale
   const bar = document.createElement('div');
   bar.className = 'g-reveal-bar';
   document.body.appendChild(bar);
 
-  tl
-    // Flash d'entrée
-    .to(flash, { opacity: 0.18, duration: 0.08, ease: 'none' })
-    .to(flash, { opacity: 0,    duration: 0.35, ease: 'power2.out', onComplete: () => flash.remove() })
+  const tl = gsap.timeline({ onComplete: () => bar.remove() });
 
+  tl
     // Barre qui traverse
-    .set(bar, { scaleX: 0, opacity: 1, transformOrigin: 'left center' }, 0.05)
-    .to(bar,  { scaleX: 1, duration: 0.45, ease: 'expo.inOut' }, 0.05)
+    .set(bar, { scaleX: 0, transformOrigin: 'left center' })
+    .to(bar,  { scaleX: 1, duration: 0.45, ease: 'expo.inOut' })
     .to(bar,  { scaleX: 0, transformOrigin: 'right center', duration: 0.38, ease: 'expo.inOut' })
 
-    // Onde hero — plus lumineuse sur mobile
-    .to('.hero-wave', { opacity: mobile ? 0.22 : 0.18, duration: 0.7, ease: 'power2.out' }, '-=0.35')
+    // Onde hero
+    .to('.hero-wave', { opacity: mobile ? 0.22 : 0.18, duration: 0.6, ease: 'power2.out' }, '-=0.3')
 
-    // Hero tag — entrée avec skew fort
-    .set('.hero-tag', { opacity: 1 })
-    .from('.hero-tag', {
-      x: mobile ? 30 : 15, skewX: mobile ? 12 : 8, opacity: 0,
-      duration: 0.5, ease: 'power3.out'
-    }, '-=0.25')
+    // Hero tag
+    .from('.hero-tag', { x: mobile ? 30 : 15, skewX: mobile ? 10 : 6, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.2')
 
-    // Nom — lettres en chute 3D, plus ample sur mobile
-    .set('.hero-name', { opacity: 1 })
+    // Nom — lettres en chute 3D
     .from('.hero-name .g-char', {
       opacity: 0,
       y:        mobile ? 90  : 100,
@@ -276,20 +272,15 @@ function triggerHeroAnimations() {
     // Ligne séparatrice
     .from('.g-line-sep', { scaleX: 0, duration: 0.5, ease: 'power3.out', transformOrigin: 'left' }, '-=0.15')
 
-    // Sous-titre — slide + fade (iOS Safari safe, pas de clipPath)
-    .set('.hero-sub', { opacity: 1 })
+    // Sous-titre
     .from('.hero-sub', { y: 28, opacity: 0, duration: 0.55, ease: 'power3.out' }, '-=0.15')
 
-    // Boutons — rebond asymétrique
-    .set('.btn-primary, .btn-ghost', { opacity: 1 })
+    // Boutons
     .from('.btn-primary', { x: mobile ? -50 : -40, opacity: 0, duration: 0.55, ease: 'back.out(2.5)' }, '-=0.1')
     .from('.btn-ghost',   { x: mobile ?  50 :  40, opacity: 0, duration: 0.55, ease: 'back.out(2.5)' }, '-=0.45')
 
     // Scroll indicator
-    .set('.hero-scroll', { opacity: 1 })
-    .from('.hero-scroll', { y: -16, opacity: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)' }, '-=0.2')
-
-    .add(() => bar.remove(), '+=0.1');
+    .from('.hero-scroll', { y: -16, opacity: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)' }, '-=0.2');
 }
 
 // ── SCROLL ANIMATIONS (initialisées après le loader) ──────────
