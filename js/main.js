@@ -98,11 +98,8 @@ if (heroContent) heroContent.classList.add('hero-loading');
 
 // Fallback : retire la classe et nettoie tout inline style GSAP
 function _heroFallback() {
-  if (heroContent) {
-    heroContent.classList.remove('hero-loading');
-    heroContent.style.opacity = '';
-  }
-  gsap.set('.hero-tag, .hero-name, .hero-sub, .hero-cta, .hero-scroll', { clearProps: 'all' });
+  if (heroContent) heroContent.classList.remove('hero-loading');
+  gsap.set('.hero-tag, .hero-name, .g-line-sep, .hero-sub, .hero-cta, .hero-scroll', { visibility: 'visible', clearProps: 'all' });
 }
 
 // ── LOADER SPECTRUM ANALYZER ──────────────────────────────────
@@ -235,17 +232,8 @@ setTimeout(() => {
 function triggerHeroAnimations() {
   const mobile = window.innerWidth < 680;
 
-  // Masque tous les éléments hero individuellement (synchrone, zéro flash)
-  gsap.set('.hero-tag', { opacity: 0, x: mobile ? 30 : 15, skewX: mobile ? 10 : 6 });
-  gsap.set('.hero-name', { opacity: 0 });
-  gsap.set('.hero-name .g-char', { opacity: 0, y: mobile ? 90 : 100, rotateX: mobile ? -90 : -80, scaleY: mobile ? 0.2 : 0.4 });
-  gsap.set('.g-line-sep', { opacity: 0, scaleX: 0, transformOrigin: 'left' });
-  gsap.set('.hero-sub', { opacity: 0, y: 28 });
-  gsap.set('.hero-cta .btn-primary', { opacity: 0, y: 30 });
-  gsap.set('.hero-cta .btn-ghost',   { opacity: 0, y: 30 });
-  gsap.set('.hero-scroll', { opacity: 0, y: -16 });
-
-  // Retire la classe — le container est visible mais tous les enfants sont déjà cachés
+  // Les éléments sont déjà cachés via visibility:hidden dans le HTML
+  // On les rend visibles juste avant leur animation via gsap.set visibility:visible
   if (heroContent) heroContent.classList.remove('hero-loading');
 
   // Barre reveal horizontale
@@ -262,9 +250,11 @@ function triggerHeroAnimations() {
 
     .to('.hero-wave', { opacity: mobile ? 0.22 : 0.18, duration: 0.6, ease: 'power2.out' }, '-=0.3')
 
-    .to('.hero-tag', { x: 0, skewX: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, '-=0.2')
+    .set('.hero-tag', { visibility: 'visible', x: mobile ? 30 : 15, skewX: mobile ? 10 : 6, opacity: 0 })
+    .to('.hero-tag',  { x: 0, skewX: 0, opacity: 1, duration: 0.5, ease: 'power3.out' })
 
-    .set('.hero-name', { opacity: 1 })
+    .set('.hero-name', { visibility: 'visible' })
+    .set('.hero-name .g-char', { opacity: 0, y: mobile ? 90 : 100, rotateX: mobile ? -90 : -80, scaleY: mobile ? 0.2 : 0.4 })
     .to('.hero-name .g-char', {
       opacity: 1, y: 0, rotateX: 0, scaleY: 1,
       duration: mobile ? 0.65 : 0.55,
@@ -273,14 +263,20 @@ function triggerHeroAnimations() {
       transformOrigin: '50% 100% -20px'
     }, '-=0.1')
 
-    .to('.g-line-sep', { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power3.out' }, '-=0.15')
+    .set('.g-line-sep', { visibility: 'visible', scaleX: 0, opacity: 0, transformOrigin: 'left' })
+    .to('.g-line-sep',  { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power3.out' })
 
-    .to('.hero-sub', { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, '-=0.15')
+    .set('.hero-sub', { visibility: 'visible', y: 28, opacity: 0 })
+    .to('.hero-sub',  { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, '-=0.15')
 
+    .set('.hero-cta', { visibility: 'visible' })
+    .set('.hero-cta .btn-primary', { y: 30, opacity: 0 })
+    .set('.hero-cta .btn-ghost',   { y: 30, opacity: 0 })
     .to('.hero-cta .btn-primary', { y: 0, opacity: 1, duration: 0.55, ease: 'back.out(2)', clearProps: 'all' }, '-=0.1')
     .to('.hero-cta .btn-ghost',   { y: 0, opacity: 1, duration: 0.55, ease: 'back.out(2)', clearProps: 'all' }, '-=0.4')
 
-    .to('.hero-scroll', { y: 0, opacity: 1, duration: 0.7, ease: 'elastic.out(1, 0.5)' }, '-=0.2');
+    .set('.hero-scroll', { visibility: 'visible', y: -16, opacity: 0 })
+    .to('.hero-scroll',  { y: 0, opacity: 1, duration: 0.7, ease: 'elastic.out(1, 0.5)' }, '-=0.3');
 }
 
 // ── SCROLL ANIMATIONS (initialisées après le loader) ──────────
