@@ -1272,13 +1272,13 @@ footer {
 .loader-progress {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: rgba(255,255,255,0.06);
+  height: 1px;
+  background: transparent;
 }
 .loader-progress-fill {
   height: 100%;
   width: 0%;
-  background: #fff;
+  background: rgba(255,255,255,0.35);
   transition: width 0.1s linear;
 }
 
