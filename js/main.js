@@ -235,7 +235,14 @@ setTimeout(() => {
 function triggerHeroAnimations() {
   const mobile = window.innerWidth < 680;
 
-  // Révèle le hero-content (retire la classe CSS qui le cachait)
+  // Masque chaque élément individuellement AVANT de retirer la classe du container
+  // → zéro flash, aucun frame visible entre les deux états
+  gsap.set([
+    '.hero-tag', '.hero-name', '.g-line-sep',
+    '.hero-sub', '.hero-cta .btn-primary', '.hero-cta .btn-ghost', '.hero-scroll'
+  ], { opacity: 0 });
+
+  // Maintenant on peut retirer la classe sans rien voir apparaître
   if (heroContent) heroContent.classList.remove('hero-loading');
 
   // Barre reveal horizontale
@@ -255,32 +262,42 @@ function triggerHeroAnimations() {
     .to('.hero-wave', { opacity: mobile ? 0.22 : 0.18, duration: 0.6, ease: 'power2.out' }, '-=0.3')
 
     // Hero tag
-    .from('.hero-tag', { x: mobile ? 30 : 15, skewX: mobile ? 10 : 6, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.2')
+    .to('.hero-tag', { x: 0, skewX: 0, opacity: 1, duration: 0.5, ease: 'power3.out',
+      startAt: { x: mobile ? 30 : 15, skewX: mobile ? 10 : 6 }
+    }, '-=0.2')
 
     // Nom — lettres en chute 3D
-    .from('.hero-name .g-char', {
-      opacity: 0,
-      y:        mobile ? 90  : 100,
-      rotateX:  mobile ? -90 : -80,
-      scaleY:   mobile ? 0.2 : 0.4,
+    .to('.hero-name .g-char', {
+      opacity: 1, y: 0, rotateX: 0, scaleY: 1,
       duration: mobile ? 0.65 : 0.55,
       stagger:  mobile ? 0.032 : 0.028,
       ease: 'back.out(2)',
+      startAt: { y: mobile ? 90 : 100, rotateX: mobile ? -90 : -80, scaleY: mobile ? 0.2 : 0.4 },
       transformOrigin: '50% 100% -20px'
     }, '-=0.1')
 
     // Ligne séparatrice
-    .from('.g-line-sep', { scaleX: 0, duration: 0.5, ease: 'power3.out', transformOrigin: 'left' }, '-=0.15')
+    .to('.g-line-sep', { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power3.out',
+      startAt: { scaleX: 0 }, transformOrigin: 'left'
+    }, '-=0.15')
 
     // Sous-titre
-    .from('.hero-sub', { y: 28, opacity: 0, duration: 0.55, ease: 'power3.out' }, '-=0.15')
+    .to('.hero-sub', { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out',
+      startAt: { y: 28 }
+    }, '-=0.15')
 
-    // Boutons — ciblés dans .hero-cta uniquement, pas x sur mobile
-    .from('.hero-cta .btn-primary', { x: mobile ? 0 : -40, y: mobile ? 30 : 0, opacity: 0, duration: 0.55, ease: 'back.out(2)', clearProps: 'all' }, '-=0.1')
-    .from('.hero-cta .btn-ghost',   { x: mobile ? 0 :  40, y: mobile ? 30 : 0, opacity: 0, duration: 0.55, ease: 'back.out(2)', clearProps: 'all' }, '-=0.4')
+    // Boutons
+    .to('.hero-cta .btn-primary', { y: 0, opacity: 1, duration: 0.55, ease: 'back.out(2)', clearProps: 'all',
+      startAt: { y: 30 }
+    }, '-=0.1')
+    .to('.hero-cta .btn-ghost', { y: 0, opacity: 1, duration: 0.55, ease: 'back.out(2)', clearProps: 'all',
+      startAt: { y: 30 }
+    }, '-=0.4')
 
     // Scroll indicator
-    .from('.hero-scroll', { y: -16, opacity: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)' }, '-=0.2');
+    .to('.hero-scroll', { y: 0, opacity: 1, duration: 0.7, ease: 'elastic.out(1, 0.5)',
+      startAt: { y: -16 }
+    }, '-=0.2');
 }
 
 // ── SCROLL ANIMATIONS (initialisées après le loader) ──────────
