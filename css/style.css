@@ -227,7 +227,6 @@ h1, h2, h3 {
   margin: 0 auto 44px;
   font-weight: 400;
   line-height: 1.7;
-  clip-path: inset(0 0% 0 0);
 }
 
 .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
@@ -1269,7 +1268,7 @@ footer {
   align-items: center;
   justify-content: center;
   pointer-events: all;
-  clip-path: inset(0 0 0% 0);
+  /* pas de clip-path ici — la fermeture se fait via opacity+translateY (iOS Safari safe) */
 }
 .loader-inner {
   display: flex;
@@ -1316,7 +1315,7 @@ footer {
   background: #fff;
   transform: scaleX(0);
   transform-origin: left center;
-  z-index: 999998;
+  z-index: 1000001;
   pointer-events: none;
   mix-blend-mode: difference;
 }

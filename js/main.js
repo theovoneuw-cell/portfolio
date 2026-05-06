@@ -205,10 +205,13 @@ setTimeout(() => {
   gsap.to(fill, { width: '100%', duration: 0.3, ease: 'power2.out',
     onComplete: () => {
       setTimeout(() => {
+        // Fermeture iOS Safari safe : opacity + translateY (pas clipPath)
+        gsap.to('.loader-inner', { opacity: 0, y: -20, duration: 0.35, ease: 'power2.in' });
         gsap.to(loader, {
-          clipPath: 'inset(0 0 100% 0)',
-          duration: 0.85,
-          ease: 'power4.inOut',
+          opacity: 0,
+          duration: 0.5,
+          delay: 0.25,
+          ease: 'power2.inOut',
           onComplete: () => {
             loader.style.display = 'none';
             document.body.style.overflow = '';
@@ -229,7 +232,7 @@ function triggerHeroAnimations() {
 
   // 1. Flash blanc — impact maximal même sur mobile
   const flash = document.createElement('div');
-  flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;pointer-events:none;opacity:0';
+  flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:1000002;pointer-events:none;opacity:0';
   document.body.appendChild(flash);
 
   // 2. Barre reveal
@@ -273,11 +276,9 @@ function triggerHeroAnimations() {
     // Ligne séparatrice
     .from('.g-line-sep', { scaleX: 0, duration: 0.5, ease: 'power3.out', transformOrigin: 'left' }, '-=0.15')
 
-    // Sous-titre — slide + fade (iOS Safari safe)
+    // Sous-titre — slide + fade (iOS Safari safe, pas de clipPath)
     .set('.hero-sub', { opacity: 1 })
-    .from('.hero-sub', { y: mobile ? 28 : 0, opacity: 0, duration: 0.55, ease: 'power3.out',
-      ...(mobile ? {} : { clipPath: 'inset(0 100% 0 0)' })
-    }, '-=0.15')
+    .from('.hero-sub', { y: 28, opacity: 0, duration: 0.55, ease: 'power3.out' }, '-=0.15')
 
     // Boutons — rebond asymétrique
     .set('.btn-primary, .btn-ghost', { opacity: 1 })
