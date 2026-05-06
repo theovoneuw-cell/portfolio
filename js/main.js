@@ -275,9 +275,9 @@ function triggerHeroAnimations() {
     // Sous-titre
     .from('.hero-sub', { y: 28, opacity: 0, duration: 0.55, ease: 'power3.out' }, '-=0.15')
 
-    // Boutons
-    .from('.btn-primary', { x: mobile ? -50 : -40, opacity: 0, duration: 0.55, ease: 'back.out(2.5)' }, '-=0.1')
-    .from('.btn-ghost',   { x: mobile ?  50 :  40, opacity: 0, duration: 0.55, ease: 'back.out(2.5)' }, '-=0.45')
+    // Boutons — ciblés dans .hero-cta uniquement, pas x sur mobile
+    .from('.hero-cta .btn-primary', { x: mobile ? 0 : -40, y: mobile ? 30 : 0, opacity: 0, duration: 0.55, ease: 'back.out(2)', clearProps: 'all' }, '-=0.1')
+    .from('.hero-cta .btn-ghost',   { x: mobile ? 0 :  40, y: mobile ? 30 : 0, opacity: 0, duration: 0.55, ease: 'back.out(2)', clearProps: 'all' }, '-=0.4')
 
     // Scroll indicator
     .from('.hero-scroll', { y: -16, opacity: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)' }, '-=0.2');
