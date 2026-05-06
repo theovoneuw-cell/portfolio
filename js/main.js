@@ -94,6 +94,11 @@ if (heroName) {
   gsap.set('.hero-tag, .hero-name, .hero-sub, .hero-cta, .hero-scroll', { opacity: 0 });
 }
 
+// Fallback : si les animations plantent, on s'assure que le hero reste visible
+function _heroFallback() {
+  gsap.set('.hero-tag, .hero-name, .hero-sub, .hero-cta, .hero-scroll', { opacity: 1, clearProps: 'all' });
+}
+
 // ── LOADER SPECTRUM ANALYZER ──────────────────────────────────
 (function() {
   const canvas = document.getElementById('loaderCanvas');
@@ -208,8 +213,8 @@ setTimeout(() => {
             loader.style.display = 'none';
             document.body.style.overflow = '';
             if (window._stopLoaderCanvas) window._stopLoaderCanvas();
-            initScrollAnimations();
-            triggerHeroAnimations();
+            try { initScrollAnimations(); } catch(e) { console.warn('initScrollAnimations:', e); }
+            try { triggerHeroAnimations(); } catch(e) { console.warn('triggerHeroAnimations:', e); _heroFallback(); }
           }
         });
       }, 150);
@@ -411,7 +416,7 @@ function initScrollAnimations() {
 
     if (dot)  gsap.from(dot,  {
       scrollTrigger: { trigger: item, start: "top 95%" },
-      opacity: 0, x: mob ? -30 : -20, duration: 0.5, ease: "power2.out",
+      opacity: 0, x: mob ? 0 : -20, y: mob ? -10 : 0, duration: 0.5, ease: "power2.out",
       delay: i * 0.04 + 0.1
     });
     if (body) gsap.from(body, {

@@ -344,7 +344,7 @@ h1, h2, h3 {
 .stat-label { font-size: 12px; color: var(--muted); letter-spacing: 0.3px; margin-top: 6px; }
 
 /* ── PARCOURS ─────────────────────────────────────────────── */
-#parcours { background: var(--bg2); }
+#parcours { background: var(--bg2); overflow-x: hidden; }
 
 .timeline {
   display: flex;
@@ -1100,9 +1100,23 @@ footer {
   .filter-tabs { gap: 4px; }
   .filter-btn { padding: 6px 12px; font-size: 10px; }
 
-  /* Timeline */
-  .timeline { margin-left: 72px; }
-  .timeline-date { left: -80px; width: 66px; font-size: 10px; }
+  /* Timeline — layout vertical sur mobile, date au-dessus du body */
+  .timeline { margin-left: 20px; }
+  .timeline-line { left: 0; }
+  .timeline-item {
+    flex-direction: column;
+    padding: 0 0 36px 24px;
+  }
+  .timeline-item::before { left: -4px; top: 6px; }
+  .timeline-date {
+    position: static;
+    width: auto;
+    white-space: normal;
+    text-align: left;
+    font-size: 10px;
+    margin-bottom: 4px;
+    color: var(--muted);
+  }
 
   /* Footer */
   .footer-inner { flex-direction: column; text-align: center; }
@@ -1112,8 +1126,8 @@ footer {
   .portfolio-grid { grid-template-columns: 1fr; }
   .about-stats { flex-direction: column; gap: 20px; }
   .filter-btn { padding: 5px 10px; font-size: 9px; }
-  .timeline { margin-left: 56px; }
-  .timeline-date { left: -62px; width: 52px; font-size: 9px; }
+  .timeline { margin-left: 16px; }
+  .timeline-date { font-size: 9px; }
   .tool-item { font-size: 13px; padding: 9px 16px; }
   .hero-name { font-size: clamp(48px, 15vw, 80px); }
   .g-line-sep { display: none; }
