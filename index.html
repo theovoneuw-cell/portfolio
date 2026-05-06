@@ -29,6 +29,16 @@
 </head>
 <body>
 
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-inner">
+      <canvas id="loaderCanvas" width="220" height="72"></canvas>
+      <div class="loader-name">TVE</div>
+      <div class="loader-label">Chargement</div>
+    </div>
+    <div class="loader-progress"><div class="loader-progress-fill"></div></div>
+  </div>
+
   <!-- NAVIGATION -->
   <nav id="navbar">
     <div class="nav-inner">
@@ -874,6 +884,9 @@
     </a>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/TextPlugin.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
