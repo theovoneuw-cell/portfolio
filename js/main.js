@@ -56,22 +56,25 @@ if (navClose) {
 // ── GSAP ANIMATIONS ───────────────────────────────────────────
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
-// ── CURSOR PERSONNALISÉ ───────────────────────────────────────
-const cursor    = document.createElement('div');
-const cursorDot = document.createElement('div');
-cursor.className    = 'g-cursor';
-cursorDot.className = 'g-cursor-dot';
-document.body.appendChild(cursor);
-document.body.appendChild(cursorDot);
+// ── CURSOR PERSONNALISÉ (desktop pointer only) ────────────────
+const isTouch = window.matchMedia('(pointer: coarse)').matches;
+if (!isTouch) {
+  const cursor    = document.createElement('div');
+  const cursorDot = document.createElement('div');
+  cursor.className    = 'g-cursor';
+  cursorDot.className = 'g-cursor-dot';
+  document.body.appendChild(cursor);
+  document.body.appendChild(cursorDot);
 
-window.addEventListener('mousemove', e => {
-  gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.05 });
-  gsap.to(cursor,    { x: e.clientX, y: e.clientY, duration: 0.18, ease: "power2.out" });
-});
-document.querySelectorAll('a, button, .service-card, .track-card, .filter-btn').forEach(el => {
-  el.addEventListener('mouseenter', () => cursor.classList.add('g-cursor--hover'));
-  el.addEventListener('mouseleave', () => cursor.classList.remove('g-cursor--hover'));
-});
+  window.addEventListener('mousemove', e => {
+    gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.05 });
+    gsap.to(cursor,    { x: e.clientX, y: e.clientY, duration: 0.18, ease: "power2.out" });
+  });
+  document.querySelectorAll('a, button, .service-card, .track-card, .filter-btn').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('g-cursor--hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('g-cursor--hover'));
+  });
+}
 
 // ── PRÉPARE LES LETTRES DU NOM (DOM, avant tout) ─────────────
 const heroName = document.querySelector('.hero-name');
@@ -91,10 +94,16 @@ if (heroName) {
   const canvas = document.getElementById('loaderCanvas');
   if (!canvas) return;
   const ctx  = canvas.getContext('2d');
-  const W    = canvas.width;
-  const H    = canvas.height;
-  const N    = 28;                        // nombre de barres
-  const GAP  = 3;
+
+  // Dimensions responsives selon la largeur de l'écran
+  const vw   = window.innerWidth;
+  const W    = Math.min(vw * 0.7, 280);
+  const H    = Math.round(W * 0.33);
+  canvas.width  = W;
+  canvas.height = H;
+
+  const N    = vw < 480 ? 18 : 28;
+  const GAP  = vw < 480 ? 2  : 3;
   const barW = (W - GAP * (N - 1)) / N;
 
   // État de chaque barre : hauteur cible, hauteur actuelle, vitesse
@@ -205,55 +214,59 @@ setTimeout(() => {
 
 // ── HERO ANIMATIONS (appelées après le loader) ────────────────
 function triggerHeroAnimations() {
-  const tl = gsap.timeline();
+  const tl     = gsap.timeline();
+  const mobile = window.innerWidth < 680;
 
-  // 1. Ligne horizontale qui traverse l'écran (reveal bar)
+  // Valeurs adaptées selon le device
+  const charY      = mobile ? 60  : 100;
+  const btnOffset  = mobile ? 24  : 40;
+  const staggerVal = mobile ? 0.025 : 0.032;
+
+  // 1. Barre blanche qui traverse l'écran
   const bar = document.createElement('div');
   bar.className = 'g-reveal-bar';
   document.body.appendChild(bar);
 
   tl
-    // Barre blanche qui balaye de gauche à droite
     .set(bar, { scaleX: 0, transformOrigin: 'left center' })
-    .to(bar, { scaleX: 1, duration: 0.55, ease: 'power3.inOut' })
-    .to(bar, { scaleX: 0, transformOrigin: 'right center', duration: 0.45, ease: 'power3.inOut' })
+    .to(bar,  { scaleX: 1, duration: 0.5, ease: 'power3.inOut' })
+    .to(bar,  { scaleX: 0, transformOrigin: 'right center', duration: 0.4, ease: 'power3.inOut' })
 
-    // 2. Onde hero explose depuis le bas (opacity monte)
-    .to('.hero-wave', { opacity: 0.18, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    // 2. Onde hero apparaît
+    .to('.hero-wave', { opacity: mobile ? 0.12 : 0.18, duration: 0.6, ease: 'power2.out' }, '-=0.3')
 
-    // 3. Hero tag — glitch puis stabilise
+    // 3. Hero tag — glitch
     .set('.hero-tag', { opacity: 1 })
-    .from('.hero-tag', {
-      x: () => (Math.random() - 0.5) * 30,
-      skewX: 8, duration: 0.5, ease: 'power3.out'
-    }, '-=0.2')
+    .from('.hero-tag', { x: mobile ? 0 : 15, skewX: mobile ? 4 : 8, duration: 0.45, ease: 'power3.out' }, '-=0.2')
 
-    // 4. Nom — lettres tombent en 3D une par une
+    // 4. Nom — lettres en 3D
     .set('.hero-name', { opacity: 1 })
     .from('.hero-name .g-char', {
-      opacity: 0, y: 100, rotateX: -80, scaleY: 0.4,
-      duration: 0.6, stagger: 0.032,
+      opacity: 0, y: charY, rotateX: -80, scaleY: 0.4,
+      duration: 0.55, stagger: staggerVal,
       ease: 'back.out(1.6)',
       transformOrigin: '50% 100% -20px'
     }, '-=0.15')
 
-    // 5. Ligne séparatrice qui s'étire sous le nom
+    // 5. Ligne séparatrice (masquée sur très petit écran via CSS)
     .from('.g-line-sep', { scaleX: 0, duration: 0.5, ease: 'power3.out', transformOrigin: 'left' }, '-=0.1')
 
-    // 6. Sous-titre — masque clip qui s'ouvre
+    // 6. Sous-titre — fade+slide sur mobile (pas clipPath, iOS Safari safe)
     .set('.hero-sub', { opacity: 1 })
-    .from('.hero-sub', { clipPath: 'inset(0 100% 0 0)', duration: 0.55, ease: 'power3.out' }, '-=0.1')
+    .from('.hero-sub', mobile
+      ? { y: 16, opacity: 0, duration: 0.5, ease: 'power3.out' }
+      : { clipPath: 'inset(0 100% 0 0)', duration: 0.55, ease: 'power3.out' }
+    , '-=0.1')
 
-    // 7. Boutons depuis les côtés avec rebond
+    // 7. Boutons
     .set('.btn-primary, .btn-ghost', { opacity: 1 })
-    .from('.btn-primary', { x: -40, opacity: 0, duration: 0.5, ease: 'back.out(2)' }, '-=0.1')
-    .from('.btn-ghost',   { x:  40, opacity: 0, duration: 0.5, ease: 'back.out(2)' }, '-=0.45')
+    .from('.btn-primary', { x: -btnOffset, opacity: 0, duration: 0.45, ease: 'back.out(2)' }, '-=0.1')
+    .from('.btn-ghost',   { x:  btnOffset, opacity: 0, duration: 0.45, ease: 'back.out(2)' }, '-=0.4')
 
-    // 8. Scroll indicator fade
+    // 8. Scroll indicator
     .set('.hero-scroll', { opacity: 1 })
-    .from('.hero-scroll', { y: -12, opacity: 0, duration: 0.7, ease: 'power2.out' }, '-=0.2')
+    .from('.hero-scroll', { y: -10, opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.2')
 
-    // 9. Nettoyage de la barre
     .add(() => bar.remove(), '+=0.1');
 }
 
@@ -362,18 +375,20 @@ function initScrollAnimations() {
   });
 }
 
-// ── MAGNETIC BUTTONS (pas besoin d'attendre le loader) ────────
-document.querySelectorAll('.btn-primary, .btn-ghost, .btn-nav').forEach(btn => {
-  btn.addEventListener('mousemove', e => {
-    const r  = btn.getBoundingClientRect();
-    const dx = e.clientX - (r.left + r.width  / 2);
-    const dy = e.clientY - (r.top  + r.height / 2);
-    gsap.to(btn, { x: dx * 0.35, y: dy * 0.35, duration: 0.3, ease: "power2.out" });
+// ── MAGNETIC BUTTONS (desktop uniquement) ─────────────────────
+if (!isTouch) {
+  document.querySelectorAll('.btn-primary, .btn-ghost, .btn-nav').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r  = btn.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width  / 2);
+      const dy = e.clientY - (r.top  + r.height / 2);
+      gsap.to(btn, { x: dx * 0.35, y: dy * 0.35, duration: 0.3, ease: "power2.out" });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
+    });
   });
-  btn.addEventListener('mouseleave', () => {
-    gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
-  });
-});
+}
 
 // ── PORTFOLIO FILTER + VOIR PLUS ─────────────────────────────
 const gridWrap = document.querySelector('.portfolio-grid-wrap');
